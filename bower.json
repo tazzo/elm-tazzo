@@ -1,0 +1,25 @@
+{
+  "name": "elm-tazzo",
+  "description": "Elm Tazzo Blog?",
+  "main": "",
+  "authors": [
+    "tazzo"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "elm",
+    "elm-mdl",
+    "material"
+  ],
+  "homepage": "https://github.com/tazzo/elm-tazzo",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+
+  }
+}

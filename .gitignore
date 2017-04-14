@@ -1,0 +1,5 @@
+/elm-stuff
+/node_modules
+/public
+/bower_components
+.DS_Store

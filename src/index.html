@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+      <title>Elm Mdl Blog</title>
+      <meta name="description" content="elm mdl">
+
+      <!-- See https://goo.gl/OOhYW5 -->
+      <link rel="manifest" href="/manifest.json">
+
+      <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500|Roboto+Mono|Roboto+Condensed:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+      <link rel="stylesheet" href="https://code.getmdl.io/1.2.0/material.blue-orange.min.css" />
+
+      <script src="https://cdn.polyfill.io/v2/polyfill.js?features=Event.focusin"></script>
+
+
+      <link rel="stylesheet" href="styles.css">
+
+
+    </head>
+
+    <body>
+      
+      <div id="main">
+
+      <script src="Main.js"></script>
+      <script>
+          var node = document.getElementById('main');
+          var app = Elm.Main.embed(node);
+      </script>
+
+
+  </body>
+
+</html>
