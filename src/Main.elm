@@ -10,12 +10,14 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (href, class, style)
 import Material
-import Material.Scheme
 import Material.Button as Button
 import Material.Options as Options exposing (css)
 import Material.Layout as Layout
 import Material.Color as Color
 import Material.Icon as Icon
+import Material.Card as Card
+import Material.List as Lists
+import Material.Menu as Menu
 
 -- MODEL
 
@@ -47,10 +49,7 @@ model =
 -- You need to tag `Msg` that are coming from `Mdl` so you can dispatch them
 -- appropriately.
 type Msg
-    = Increase
-    | Reset
-    | Mdl (Material.Msg Msg)
-    | SelectTab Int
+    = Mdl (Material.Msg Msg)
 
 
 -- Boilerplate: Msg clause for internal Mdl messages.
@@ -59,23 +58,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increase ->
-            ( { model | count = model.count + 1 }
-            , Cmd.none
-            )
-
-        Reset ->
-            ( { model | count = 0 }
-            , Cmd.none
-            )
-
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
             Material.update Mdl msg_ model
-
-        SelectTab num ->
-            { model | selectedTab = num } ! []
-
 
 
 -- VIEW
@@ -94,13 +79,10 @@ view model =
             [ Layout.fixedHeader
             ,Layout.fixedDrawer
             , Layout.selectedTab model.selectedTab
-            , Layout.onSelectTab SelectTab
             ]
             { header = header model
             , drawer = drawer
-            , tabs =  (  [ text "Milk", text "Oranges" , text "Red" , text "Blue", text "Yellow", text "Brown"   ],
-                        [ Color.background (Color.color Color.Indigo Color.S400) ]
-                      )
+            , tabs =  (  [ ],[ ]  )
             , main = [ viewBody model ]
             }
 
@@ -134,51 +116,77 @@ header model =
                 [ Layout.link
                     [  ]
                     [ Icon.i "photo" ]
-                , Layout.link
-                    [ Layout.href "https://github.com/debois/elm-mdl" ]
-                    [ span [] [ text "github" ] ]
-                , Layout.link
-                    [ Layout.href "http://package.elm-lang.org/packages/debois/elm-mdl/latest/" ]
-                    [ text "elm-package" ]
+                , menu model
                 ]
             ]
         ]
 
 
+menu : Model -> Html Msg
+menu model = Menu.render Mdl [0,1] model.mdl
+  [ Menu.ripple, Menu.bottomRight]
+  [ Menu.item
+      [ ]
+      [ text "English (US)" ]
+  , Menu.item
+      [ ]
+      [ text "français" ]
+  , Menu.item
+      [ ]
+      [ text "中文" ]
+  ]
 
+white : Options.Property c m
+white =
+  Color.text Color.white
 
 viewBody : Model -> Html Msg
-viewBody model =
-    case model.selectedTab of
-        0 ->
-            viewCounter model
+viewBody model = Lists.ul []
+ [ Lists.li [] [ Lists.content [] [ card1 ] ]
+ , Lists.li [] [ Lists.content [] [ card2 ] ]
+ ]
 
-        1 ->
-            text "something else"
+card1 = Card.view
+  [ Color.background (Color.color Color.DeepOrange Color.S400)
+  , css "width" "192px"
+  , css "height" "192px"
+  ]
+  [ Card.title [ ] [ Card.head [ white ] [ text "Roskilde Festival" ] ]
+  , Card.text [ white ] [ text "Buy tickets before May" ]
+  , Card.actions
+      [ Card.border, css "vertical-align" "center", css "text-align" "right", white ]
+      [ Button.render Mdl [8,1] model.mdl
+          [ Button.icon, Button.ripple ]
+          [ Icon.i "favorite_border" ]
+      , Button.render Mdl [8,2] model.mdl
+          [ Button.icon, Button.ripple ]
+          [ Icon.i "event_available" ]
+      ]
+  ]
 
-        _ ->
-            text "404"
-
-
-viewCounter : Model -> Html Msg
-viewCounter model =
-    div
-        [ style [ ( "padding", "2rem" ) ] ]
-        [ text ("Current count: " ++ toString model.count)
-        , Button.render Mdl
-            [ 0 ]
-            model.mdl
-            [ Options.onClick Increase
-            , css "margin" "0 24px"
-            ]
-            [ text "Increase" ]
-        , Button.render Mdl
-            [ 1 ]
-            model.mdl
-            [ Options.onClick Reset ]
-            [ text "Reset" ]
-        ]
-
+card2 = Card.view
+  [ css "width" "400px"
+  , Color.background (Color.color Color.Amber Color.S600)
+  ]
+  [ Card.title
+      [ css "align-content" "flex-start"
+      , css "flex-direction" "row"
+      , css "align-items" "flex-start"
+      , css "justify-content" "space-between"
+      ]
+      [ Options.div
+          []
+          [ Card.head [ white ] [ text "Artificial Heart" ]
+          , Card.subhead [ white ] [ text "Jonathan Coulton" ]
+          ]
+      , Options.img
+          [ Options.attribute <| Html.Attributes.src "assets/images/artificial-heart.jpg"
+          , css "height" "96px"
+          , css "width" "96px"
+          ]
+          []
+      ]
+  ]
 
 main : Program Never Model Msg
 main =

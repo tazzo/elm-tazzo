@@ -7,9 +7,9 @@ var connect = require('gulp-connect');
 // File paths
 var paths = {
   dest: 'public',
-  elm: 'src/*.elm',
-  static: 'src/*.{html,css}',
-  bower:'bower_components/**'
+  elm: 'src/**/*.elm',
+  static: 'src/**/*.{html,css,jpg,png}',
+  bower:'bower_components/**/*'
 };
 
 // Init Elm
