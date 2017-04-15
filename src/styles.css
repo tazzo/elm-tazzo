@@ -5,13 +5,3 @@
 blockquote {
     margin: 1em 0;
 }
-.jumbotron {
-    margin: 2em auto;
-    max-width: 400px;
-}
-.jumbotron h2 {
-    margin-top: 0;
-}
-.jumbotron .help-block {
-    font-size: 14px;
-}
