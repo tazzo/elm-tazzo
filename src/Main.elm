@@ -91,16 +91,36 @@ view model =
           Layout.render Mdl
             model.mdl
             [ Layout.fixedHeader
+            ,Layout.fixedDrawer 
             , Layout.selectedTab model.selectedTab
             , Layout.onSelectTab SelectTab
             ]
             { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "Counter" ] ]
-            , drawer = []
+            , drawer = drawer
             , tabs =  (  [ text "Milk", text "Oranges" , text "Red" , text "Blue", text "Yellow", text "Brown"   ],
                         [ Color.background (Color.color Color.Blue Color.S400) ]
                       )
             , main = [ viewBody model ]
             }
+
+drawer : List (Html Msg)
+drawer =
+  [ Layout.title [] [ text "Example drawer" ]
+  , Layout.navigation
+    []
+    [  Layout.link
+        [ Layout.href "https://github.com/debois/elm-mdl" ]
+        [ text "github" ]
+    , Layout.link
+        [ Layout.href "http://package.elm-lang.org/packages/debois/elm-mdl/latest/" ]
+        [ text "elm-package" ]
+    , Layout.link
+        [ Layout.href "#cards"
+        , Options.onClick (Layout.toggleDrawer Mdl)
+        ]
+        [ text "Card component" ]
+    ]
+  ]
 
 
 viewBody : Model -> Html Msg
@@ -136,18 +156,11 @@ viewCounter model =
         ]
 
 
-
--- Load Google Mdl CSS. You'll likely want to do that not in code as we
--- do here, but rather in your master .html file. See the documentation
--- for the `Material` module for details.
-
-
 main : Program Never Model Msg
 main =
     Html.program
         { init = ( model, Layout.sub0 Mdl )
         , view = view
-        -- Here we've added no subscriptions, but we'll need to use the `Mdl` subscriptions for some components later.
         , subscriptions = .mdl >> Layout.subs Mdl
         , update = update
         }
