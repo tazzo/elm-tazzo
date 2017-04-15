@@ -15,6 +15,7 @@ import Material.Button as Button
 import Material.Options as Options exposing (css)
 import Material.Layout as Layout
 import Material.Color as Color
+import Material.Icon as Icon
 
 -- MODEL
 
@@ -91,14 +92,14 @@ view model =
           Layout.render Mdl
             model.mdl
             [ Layout.fixedHeader
-            ,Layout.fixedDrawer 
+            ,Layout.fixedDrawer
             , Layout.selectedTab model.selectedTab
             , Layout.onSelectTab SelectTab
             ]
-            { header = [ h1 [ style [ ( "padding", "2rem" ) ] ] [ text "Counter" ] ]
+            { header = header model
             , drawer = drawer
             , tabs =  (  [ text "Milk", text "Oranges" , text "Red" , text "Blue", text "Yellow", text "Brown"   ],
-                        [ Color.background (Color.color Color.Blue Color.S400) ]
+                        [ Color.background (Color.color Color.Indigo Color.S400) ]
                       )
             , main = [ viewBody model ]
             }
@@ -121,6 +122,29 @@ drawer =
         [ text "Card component" ]
     ]
   ]
+
+header : Model -> List (Html Msg)
+header model =
+    [ Layout.row
+            [ css "transition" "height 333ms ease-in-out 0s"
+            ]
+            [ Layout.title [] [ text "elm-mdl" ]
+            , Layout.spacer
+            , Layout.navigation []
+                [ Layout.link
+                    [  ]
+                    [ Icon.i "photo" ]
+                , Layout.link
+                    [ Layout.href "https://github.com/debois/elm-mdl" ]
+                    [ span [] [ text "github" ] ]
+                , Layout.link
+                    [ Layout.href "http://package.elm-lang.org/packages/debois/elm-mdl/latest/" ]
+                    [ text "elm-package" ]
+                ]
+            ]
+        ]
+
+
 
 
 viewBody : Model -> Html Msg
