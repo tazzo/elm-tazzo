@@ -62,7 +62,6 @@
           var app = Elm.Main.embed(node);
 
           app.ports.mathjax.subscribe(function(word) {
-          console.log(word)
           MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
           });
 
