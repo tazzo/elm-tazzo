@@ -42,21 +42,33 @@
 
       <script src="https://cdn.polyfill.io/v2/polyfill.js?features=Event.focusin"></script>
 
-
-      <link rel="stylesheet" href="styles.css">
+<!-- MathJax-->
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+      <link rel="stylesheet" href="css/styles.css">
 
 
     </head>
 
     <body>
 
-      <div id="main">
+
+      <div id="main"> </div>
 
       <script src="Main.js"></script>
       <script>
           var node = document.getElementById('main');
           var app = Elm.Main.embed(node);
+
+          app.ports.mathjax.subscribe(function(word) {
+          console.log(word)
+          MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+          });
+
       </script>
+
+
 
 
   </body>

@@ -4,7 +4,7 @@
 -}
 
 
-module Main exposing (..)
+port module Main exposing (..)
 
 
 import Html exposing (..)
@@ -18,8 +18,14 @@ import Material.Icon as Icon
 import Material.Card as Card
 import Material.List as Lists
 import Material.Menu as Menu
+import Material.Textfield as Textfield
+import Material.Options as Options
+import Material.Button as Button
+-- PORTS
 
--- MODEL
+-- port for sending strings out to JavaScript
+port mathjax : String -> Cmd msg
+
 
 
 -- You have to add a field to your model where you track the `Material.Model`.
@@ -29,17 +35,16 @@ type alias Model =
     , mdl :
         Material.Model
         -- Boilerplate: model store for any and all Mdl components you use.
-    , selectedTab : Int
+    , text : String
     }
 
 
-model : Model
-model =
+initModel : Model
+initModel =
     { count = 0
     , mdl =
         Material.model
-        -- Boilerplate: Always use this initial Mdl model store.
-    , selectedTab = 0
+    , text = ""
     }
 
 
@@ -50,9 +55,9 @@ model =
 -- appropriately.
 type Msg
     = Mdl (Material.Msg Msg)
+    | InputChange String
+    | Preview
 
-
--- Boilerplate: Msg clause for internal Mdl messages.
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -61,6 +66,10 @@ update msg model =
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
             Material.update Mdl msg_ model
+        InputChange str ->
+          ({model| text = str},  Cmd.none )
+        Preview ->
+          (model, mathjax "alpha")
 
 
 -- VIEW
@@ -78,7 +87,6 @@ view model =
             model.mdl
             [ Layout.fixedHeader
             ,Layout.fixedDrawer
-            , Layout.selectedTab model.selectedTab
             ]
             { header = header model
             , drawer = drawer
@@ -136,25 +144,43 @@ menu model = Menu.render Mdl [0,1] model.mdl
       [ text "中文" ]
   ]
 
-white : Options.Property c m
-white =
-  Color.text Color.white
 
 viewBody : Model -> Html Msg
 viewBody model = Lists.ul []
- [ Lists.li [] [ Lists.content [] [ card1 ] ]
- , Lists.li [] [ Lists.content [] [ card2 ] ]
+ [ Lists.li [] [ Lists.content [] [ tf model ] ]
+ , Lists.li [] [ Lists.content [] [ fab model ] ]
+ , Lists.li [] [ Lists.content [] [ text model.text ] ]
+ , Lists.li [] [ Lists.content [] [ card2 model ] ]
+ , Lists.li [] [ Lists.content [] [ card1 model ] ]
  ]
 
-card1 = Card.view
+fab model = Button.render Mdl [0,11] model.mdl
+  [ Button.raised
+  , Options.onClick Preview
+  ]
+  [ text "preview"]
+
+
+
+tf model = Textfield.render Mdl [0,9] model.mdl
+  [ Textfield.label "Multiline with 6 rows"
+  , Textfield.floatingLabel
+  , Textfield.textarea
+  , Textfield.rows 6
+  ,Options.onInput InputChange
+  ]
+  []
+
+card1 : Model -> Html Msg
+card1 model = Card.view
   [ Color.background (Color.color Color.DeepOrange Color.S400)
   , css "width" "192px"
   , css "height" "192px"
   ]
-  [ Card.title [ ] [ Card.head [ white ] [ text "Roskilde Festival" ] ]
-  , Card.text [ white ] [ text "Buy tickets before May" ]
+  [ Card.title [ ] [ Card.head [ Color.text Color.white ] [ text "Roskilde Festival" ] ]
+  , Card.text [ Color.text Color.white ] [ text "Buy tickets before May" ]
   , Card.actions
-      [ Card.border, css "vertical-align" "center", css "text-align" "right", white ]
+      [ Card.border, css "vertical-align" "center", css "text-align" "right", Color.text Color.white ]
       [ Button.render Mdl [8,1] model.mdl
           [ Button.icon, Button.ripple ]
           [ Icon.i "favorite_border" ]
@@ -163,8 +189,8 @@ card1 = Card.view
           [ Icon.i "event_available" ]
       ]
   ]
-
-card2 = Card.view
+card2 : Model -> Html Msg
+card2 model = Card.view
   [ css "width" "400px"
   , Color.background (Color.color Color.Amber Color.S600)
   ]
@@ -176,11 +202,11 @@ card2 = Card.view
       ]
       [ Options.div
           []
-          [ Card.head [ white ] [ text "Artificial Heart" ]
-          , Card.subhead [ white ] [ text "Jonathan Coulton" ]
+          [ Card.head [ Color.text Color.white  ] [ text "$$\\displaystyle\\sum_{i=1}^{10} t_i$$" ]
+          , Card.subhead [ Color.text Color.white  ] [ text "Jonathan Coulton" ]
           ]
       , Options.img
-          [ Options.attribute <| Html.Attributes.src "assets/images/artificial-heart.jpg"
+          [ Options.attribute <| Html.Attributes.src "images/artificial-heart.jpg"
           , css "height" "96px"
           , css "width" "96px"
           ]
@@ -191,7 +217,7 @@ card2 = Card.view
 main : Program Never Model Msg
 main =
     Html.program
-        { init = ( model, Layout.sub0 Mdl )
+        { init = ( initModel, Layout.sub0 Mdl )
         , view = view
         , subscriptions = .mdl >> Layout.subs Mdl
         , update = update
