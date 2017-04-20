@@ -4,7 +4,7 @@
 -}
 
 
-port module Main exposing (..)
+module Main exposing (..)
 
 
 import Html exposing (..)
@@ -21,11 +21,9 @@ import Material.Menu as Menu
 import Material.Textfield as Textfield
 import Material.Options as Options
 import Material.Button as Button
+import KaTeX exposing (render, renderToString, renderWithOptions, defaultOptions)
+import Markdown
 -- PORTS
-
--- port for sending strings out to JavaScript
-port mathjax : String -> Cmd msg
-
 
 
 -- You have to add a field to your model where you track the `Material.Model`.
@@ -34,7 +32,6 @@ type alias Model =
     { count : Int
     , mdl :
         Material.Model
-        -- Boilerplate: model store for any and all Mdl components you use.
     , text : String
     }
 
@@ -56,9 +53,8 @@ initModel =
 type Msg
     = Mdl (Material.Msg Msg)
     | InputChange String
-    | Preview
-
-
+    | Preview String
+  
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -68,9 +64,8 @@ update msg model =
             Material.update Mdl msg_ model
         InputChange str ->
           ({model| text = str},  Cmd.none )
-        Preview ->
-          (model, mathjax "alpha")
-
+        Preview str ->
+          (model, Cmd.none)
 
 -- VIEW
 
@@ -149,24 +144,28 @@ viewBody : Model -> Html Msg
 viewBody model = Lists.ul []
  [ Lists.li [] [ Lists.content [] [ tf model ] ]
  , Lists.li [] [ Lists.content [] [ fab model ] ]
- , Lists.li [] [ Lists.content [] [ text model.text ] ]
+ , Lists.li [] [ Lists.content [] [ Markdown.toHtml [] model.text ] ]
+ , Lists.li [] [ Lists.content [] [ render """\\displaystyle\\sum_{i=1}^{10} t_i""" ] ]
  , Lists.li [] [ Lists.content [] [ card2 model ] ]
  , Lists.li [] [ Lists.content [] [ card1 model ] ]
  ]
 
+fab: Model -> Html Msg
 fab model = Button.render Mdl [0,11] model.mdl
-  [ Button.raised
-  , Options.onClick Preview
+  [ Button.fab
+  , Button.colored
+  , Button.ripple
+  , Options.onClick <| Preview model.text
   ]
-  [ text "preview"]
+  [ Icon.i "fingerprint"]
 
-
-
+tf: Model -> Html Msg
 tf model = Textfield.render Mdl [0,9] model.mdl
   [ Textfield.label "Multiline with 6 rows"
   , Textfield.floatingLabel
   , Textfield.textarea
   , Textfield.rows 6
+  , Textfield.value model.text
   ,Options.onInput InputChange
   ]
   []
@@ -202,7 +201,7 @@ card2 model = Card.view
       ]
       [ Options.div
           []
-          [ Card.head [ Color.text Color.white  ] [ text "$$\\displaystyle\\sum_{i=1}^{10} t_i$$" ]
+          [ Card.head [ Color.text Color.white  ] [ render "\\displaystyle\\sum_{i=1}^{10} t_i" ]
           , Card.subhead [ Color.text Color.white  ] [ text "Jonathan Coulton" ]
           ]
       , Options.img
@@ -214,11 +213,17 @@ card2 model = Card.view
       ]
   ]
 
+
+subscriptions : Model -> Sub Msg
+subscriptions model = Sub.batch
+        [ Layout.subs Mdl model.mdl
+        ]
+
 main : Program Never Model Msg
 main =
     Html.program
         { init = ( initModel, Layout.sub0 Mdl )
         , view = view
-        , subscriptions = .mdl >> Layout.subs Mdl
+        , subscriptions = subscriptions
         , update = update
         }
