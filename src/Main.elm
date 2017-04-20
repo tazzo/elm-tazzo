@@ -54,7 +54,7 @@ type Msg
     = Mdl (Material.Msg Msg)
     | InputChange String
     | Preview String
-  
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -67,7 +67,7 @@ update msg model =
         Preview str ->
           (model, Cmd.none)
 
--- VIEW
+-- VIEW 
 
 
 type alias Mdl =

@@ -7,7 +7,7 @@ module KaTeX
         , renderToString
         , renderToStringWithOptions
         )
-
+ 
 {-| A library for LaTeX equation parsing. This is just an Elm API built on top of the
 [KaTeX](https://github.com/Khan/KaTeX) project which focuses on fast rendering.
 

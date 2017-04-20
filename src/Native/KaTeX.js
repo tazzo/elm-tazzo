@@ -91,7 +91,7 @@ var katex = function() {
   var exports = module.exports = {};
 
   /**
-   * KaTeX (version 0.6.0) - KaTeX is a fast, easy-to-use JavaScript library for TeX math rendering on the web.
+   * KaTeX (version 0.7.1) - KaTeX is a fast, easy-to-use JavaScript library for TeX math rendering on the web.
    *
    * Copyright (c) 2015 Khan Academy. (MIT Licensed)
    * https://github.com/Khan/KaTeX
