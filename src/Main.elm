@@ -23,6 +23,9 @@ import Material.Options as Options
 import Material.Button as Button
 import KaTeX exposing (render, renderToString, renderWithOptions, defaultOptions)
 import Markdown
+import Regex
+
+import View
 -- PORTS
 
 
@@ -67,7 +70,7 @@ update msg model =
         Preview str ->
           (model, Cmd.none)
 
--- VIEW 
+-- VIEW
 
 
 type alias Mdl =
@@ -144,11 +147,13 @@ viewBody : Model -> Html Msg
 viewBody model = Lists.ul []
  [ Lists.li [] [ Lists.content [] [ tf model ] ]
  , Lists.li [] [ Lists.content [] [ fab model ] ]
- , Lists.li [] [ Lists.content [] [ Markdown.toHtml [] model.text ] ]
- , Lists.li [] [ Lists.content [] [ render """\\displaystyle\\sum_{i=1}^{10} t_i""" ] ]
+ , Lists.li [] [ Lists.content [] [ katexMarkdown model] ]
+ , Lists.li [] [ Lists.content [] [ render """\\sum_{i=1}^{10} t_i""" ] ]
  , Lists.li [] [ Lists.content [] [ card2 model ] ]
  , Lists.li [] [ Lists.content [] [ card1 model ] ]
  ]
+
+katexMarkdown model =  View.render model.text
 
 fab: Model -> Html Msg
 fab model = Button.render Mdl [0,11] model.mdl
@@ -201,7 +206,8 @@ card2 model = Card.view
       ]
       [ Options.div
           []
-          [ Card.head [ Color.text Color.white  ] [ render "\\displaystyle\\sum_{i=1}^{10} t_i" ]
+          [ Card.head [ Color.text Color.white  ]
+          [ render "\\frac{n!}{k!(n-k)!} = \\binom{n}{k}" ]
           , Card.subhead [ Color.text Color.white  ] [ text "Jonathan Coulton" ]
           ]
       , Options.img
