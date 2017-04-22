@@ -147,7 +147,7 @@ viewBody : Model -> Html Msg
 viewBody model = Lists.ul []
  [ Lists.li [] [ Lists.content [] [ tf model ] ]
  , Lists.li [] [ Lists.content [] [ fab model ] ]
- , Lists.li [] [ Lists.content [] [ katexMarkdown model] ]
+ , Lists.li [] [ Lists.content []  <| katexMarkdown model ]
  , Lists.li [] [ Lists.content [] [ render """\\sum_{i=1}^{10} t_i""" ] ]
  , Lists.li [] [ Lists.content [] [ card2 model ] ]
  , Lists.li [] [ Lists.content [] [ card1 model ] ]
@@ -207,7 +207,7 @@ card2 model = Card.view
       [ Options.div
           []
           [ Card.head [ Color.text Color.white  ]
-          [ render "\\frac{n!}{k!(n-k)!} = \\binom{n}{k}" ]
+          [ text "ciao ", render "\\frac{n!}{k!(n-k)!} = \\binom{n}{k}", text " a tutti" ]
           , Card.subhead [ Color.text Color.white  ] [ text "Jonathan Coulton" ]
           ]
       , Options.img

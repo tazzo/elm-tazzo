@@ -1,6 +1,5 @@
 module View exposing (..)
 
-import HtmlTree exposing (HtmlTree, assembleHtml, leaf, appendText, appendChild, textWrapper, opaque,textAsMarkdown)
 import Html exposing (..)
 import KaTeX
 
@@ -21,19 +20,11 @@ wrap (fn1, fn2)  eithers  list = case list of
   [] -> eithers
   x::xs -> wrap (fn2,fn1) (eithers ++ [fn1 x]) xs
 
-render : String -> Html msg
-render str =
-  assembleHtml
-    <| assembleHtmlTree str
-
-assembleHtmlTree : String -> HtmlTree msg
-assembleHtmlTree str =
-  List.foldl applyStyle (leaf "div") (splitDefault str)
+render : String -> List (Html msg)
+render str = List.map applyStyle (splitDefault str)
 
 
-applyStyle : Either -> HtmlTree msg -> HtmlTree msg
-applyStyle either htmltree = case either of
-  Text str -> htmltree
-    |> appendChild ( str  |> textWrapper "div" |> textAsMarkdown)
-  MathTex str -> htmltree
-    |> appendChild (KaTeX.render str|> opaque )
+applyStyle : Either  -> Html msg
+applyStyle either  = case either of
+  Text str -> text str
+  MathTex str -> KaTeX.render str
