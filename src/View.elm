@@ -1,30 +1,72 @@
 module View exposing (..)
 
 import Html exposing (..)
-import KaTeX
-
+-- import KaTeX
+import Regex exposing (..)
+import Maybe exposing (..)
 
 type Either = Text String | MathTex String
 
-splitDefault:  String -> List (Either)
-splitDefault  str = splitWith "$$" str
+toStr : String -> String
+toStr str =
+  searchHeader str
+  |> searchLink
+  |> searchBold
+
+searchHeader : String -> String
+searchHeader str = replace All (regex "(#+)(.*)") applyHeader  str
+
+applyHeader : Match -> String
+applyHeader match =
+  let
+    n =
+      case match.submatches of
+        [sb1,sb2] ->
+          withDefault "" sb1
+          |> String.length
+          |> toString
+        _ -> "1"
+    text =
+      case match.submatches of
+        [sb1,sb2] ->
+          withDefault "" sb2
+        _ -> ""
+  in
+   "<h" ++ n ++ ">" ++ text ++"</h" ++ n ++ ">"
 
 
-splitWith: String -> String -> List (Either)
-splitWith spl str =
-  String.split spl str
-    |>  wrap (Text, MathTex) []
+searchLink : String -> String
+searchLink str = replace All (regex "\\[([^\\[]+)\\]\\(([^\\)]+)\\)") applyLink  str
 
-wrap : ((String -> Either),(String -> Either)) -> List(Either) -> List (String) -> List(Either)
-wrap (fn1, fn2)  eithers  list = case list of
-  [] -> eithers
-  x::xs -> wrap (fn2,fn1) (eithers ++ [fn1 x]) xs
+applyLink : Match -> String
+applyLink match =
+  let
+    link =
+      case match.submatches of
+        [sb1,sb2] ->
+          withDefault "" sb2
+        _ -> ""
+    text =
+      case match.submatches of
+        [sb1,sb2] ->
+          withDefault "" sb1
+        _ -> ""
+  in
+   "<a href=\"" ++ link ++ "\">" ++ text ++"</a>"
 
-render : String -> List (Html msg)
-render str = List.map applyStyle (splitDefault str)
+searchBold : String -> String
+searchBold str = replace All (regex "(\\*\\*|__)(.*?)\\1") applyBold  str
 
+applyBold : Match -> String
+applyBold match =
+  let
+    text =
+      case match.submatches of
+        [sb1,sb2] ->
+          withDefault "" sb2
+        _ -> ""
+  in
+   "<strong>" ++ text ++"</strong>"
 
-applyStyle : Either  -> Html msg
-applyStyle either  = case either of
-  Text str -> text str
-  MathTex str -> KaTeX.render str
+render : String -> List(Html msg)
+render str = [text str]
