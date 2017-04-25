@@ -21,11 +21,8 @@ import Material.Menu as Menu
 import Material.Textfield as Textfield
 import Material.Options as Options
 import Material.Button as Button
-import KaTeX exposing (render, renderToString, renderWithOptions, defaultOptions)
-import Markdown
-import Regex
-
 import View
+import MarkdownMath
 -- PORTS
 
 
@@ -147,13 +144,13 @@ viewBody : Model -> Html Msg
 viewBody model = Lists.ul []
  [ Lists.li [] [ Lists.content [] [ tf model ] ]
  , Lists.li [] [ Lists.content [] [ fab model ] ]
- , Lists.li [] [ Lists.content []  <| katexMarkdown model ]
- , Lists.li [] [ Lists.content [] [ render """\\sum_{i=1}^{10} t_i""" ] ]
+ , Lists.li [] [ Lists.content []  [katexMarkdown model] ]
+ , Lists.li [] [ Lists.content [] [ MarkdownMath.toHtml []  """$$\\sum_{i=1}^{10} t_i$$""" ] ]
  , Lists.li [] [ Lists.content [] [ card2 model ] ]
  , Lists.li [] [ Lists.content [] [ card1 model ] ]
  ]
 
-katexMarkdown model =  View.render model.text
+katexMarkdown model =  MarkdownMath.toHtml [] model.text
 
 fab: Model -> Html Msg
 fab model = Button.render Mdl [0,11] model.mdl
@@ -207,7 +204,7 @@ card2 model = Card.view
       [ Options.div
           []
           [ Card.head [ Color.text Color.white  ]
-          [ text "ciao ", render "\\frac{n!}{k!(n-k)!} = \\binom{n}{k}", text " a tutti" ]
+          [ text "ciao ", MarkdownMath.toHtml []  "$$\\frac{n!}{k!(n-k)!} = \\binom{n}{k}$$", text " a tutti" ]
           , Card.subhead [ Color.text Color.white  ] [ text "Jonathan Coulton" ]
           ]
       , Options.img

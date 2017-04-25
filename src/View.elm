@@ -1,17 +1,29 @@
 module View exposing (..)
 
 import Html exposing (..)
--- import KaTeX
+
 import Regex exposing (..)
 import Maybe exposing (..)
+import HtmlParser exposing (parse)
+import HtmlParser.Util exposing (toVirtualDom )
 
-type Either = Text String | MathTex String
+
+
+render : String -> List(Html msg)
+render str =
+  toStr str
+  |> parse
+  |> toVirtualDom
+
 
 toStr : String -> String
 toStr str =
   searchHeader str
   |> searchLink
   |> searchBold
+  |> searchEmphasis
+  |> searchDel
+  |> searchMath
 
 searchHeader : String -> String
 searchHeader str = replace All (regex "(#+)(.*)") applyHeader  str
@@ -68,5 +80,44 @@ applyBold match =
   in
    "<strong>" ++ text ++"</strong>"
 
-render : String -> List(Html msg)
-render str = [text str]
+searchEmphasis : String -> String
+searchEmphasis str = replace All (regex "(\\*|_)(.*?)\\1") applyEmphasis  str
+
+applyEmphasis : Match -> String
+applyEmphasis match =
+  let
+    text =
+      case match.submatches of
+        [sb1,sb2] ->
+          withDefault "" sb2
+        _ -> ""
+  in
+   "<em>" ++ text ++"</em>"
+
+searchDel : String -> String
+searchDel str = replace All (regex "\\~\\~(.*?)\\~\\~") applyDel  str
+
+applyDel : Match -> String
+applyDel match =
+  let
+    text =
+      case match.submatches of
+        [sb1] ->
+          withDefault "" sb1
+        _ -> ""
+  in
+   "<del>" ++ text ++"</del>"
+
+searchMath : String -> String
+searchMath str = replace All (regex "\\$\\$(.*?)\\$\\$") applyMath  str
+
+applyMath : Match -> String
+applyMath match =
+  let
+    text =
+      case match.submatches of
+        [sb1] ->
+          withDefault "" sb1
+        _ -> ""
+  in
+    text
