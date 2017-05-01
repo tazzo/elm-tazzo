@@ -16,13 +16,14 @@ import Material.Layout as Layout
 import Material.Color as Color
 import Material.Icon as Icon
 import Material.Card as Card
-import Material.List as Lists
 import Material.Menu as Menu
 import Material.Textfield as Textfield
 import Material.Options as Options
 import Material.Button as Button
-import View
-import MarkdownMath
+import Material.Elevation as Elevation
+import Material.Grid exposing (grid, cell, size, offset, Device(..))
+
+import MarkdownMath exposing (toHtml)
 -- PORTS
 
 
@@ -55,6 +56,20 @@ type Msg
     | InputChange String
     | Preview String
 
+type alias Message = {
+  author : String,
+  body : String,
+  title : String,
+  uid: String
+}
+
+sampleMessage : Message
+sampleMessage =
+  { author = "R.T."
+  , body = "ciao body, $$\\frac{n!}{k!(n-k)!} = \\binom{n}{k}$$ \n\n* sono un testo \n* molto lungo che dovrebbe risaizarsi quando rimpicciolisco lo schermo"
+  , title = "titolo"
+  , uid = "fjk-lds34897h998sd9sadhk3hk"
+  }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -141,16 +156,12 @@ menu model = Menu.render Mdl [0,1] model.mdl
 
 
 viewBody : Model -> Html Msg
-viewBody model = Lists.ul []
- [ Lists.li [] [ Lists.content [] [ tf model ] ]
- , Lists.li [] [ Lists.content [] [ fab model ] ]
- , Lists.li [] [ Lists.content []  [katexMarkdown model] ]
- , Lists.li [] [ Lists.content [] [ MarkdownMath.toHtml []  """$$\\sum_{i=1}^{10} t_i$$""" ] ]
- , Lists.li [] [ Lists.content [] [ card2 model ] ]
- , Lists.li [] [ Lists.content [] [ card1 model ] ]
- ]
-
-katexMarkdown model =  MarkdownMath.toHtml [] model.text
+viewBody model = grid [Color.background (Color.color Color.Grey Color.S100)]
+    [ cell [ size All 8 ] [ tf model ]
+    , cell [ size All 8 ] [ MarkdownMath.toHtml []  model.text ]
+    , cell [ size All 12 ] [ renderMessage model sampleMessage]
+    , cell [ size All 12 ] [ fab model]
+    ]
 
 fab: Model -> Html Msg
 fab model = Button.render Mdl [0,11] model.mdl
@@ -169,19 +180,21 @@ tf model = Textfield.render Mdl [0,9] model.mdl
   , Textfield.rows 6
   , Textfield.value model.text
   ,Options.onInput InputChange
+  ,Color.background Color.white
+  ,Elevation.e4
   ]
   []
 
 card1 : Model -> Html Msg
 card1 model = Card.view
-  [ Color.background (Color.color Color.DeepOrange Color.S400)
+  [ Color.background (Color.color Color.Grey Color.S200)
   , css "width" "192px"
   , css "height" "192px"
   ]
-  [ Card.title [ ] [ Card.head [ Color.text Color.white ] [ text "Roskilde Festival" ] ]
-  , Card.text [ Color.text Color.white ] [ text "Buy tickets before May" ]
+  [ Card.title [ ] [ Card.head [ Color.text Color.black ] [ text "Roskilde Festival" ] ]
+  , Card.text [ Color.text Color.black ] [ text "Buy tickets before May" ]
   , Card.actions
-      [ Card.border, css "vertical-align" "center", css "text-align" "right", Color.text Color.white ]
+      [ Card.border, css "vertical-align" "center", css "text-align" "right", Color.text Color.black ]
       [ Button.render Mdl [8,1] model.mdl
           [ Button.icon, Button.ripple ]
           [ Icon.i "favorite_border" ]
@@ -216,6 +229,19 @@ card2 model = Card.view
       ]
   ]
 
+renderMessage : Model -> Message -> Html Msg
+renderMessage model msg =Card.view
+  [  css "width" "100%"
+  , css "max-width" "600px"
+  , Elevation.e4
+  -- ,Color.background (Color.color Color.Amber Color.S600)
+  ]
+  [ Card.title  [ ]
+                [ Card.head [ ] [ toHtml [] msg.title ]
+                , Card.subhead [ ] [ toHtml [] msg.author ]
+                ]
+  , Card.text [ ] [ toHtml [] msg.body ]
+  ]
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.batch
