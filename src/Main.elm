@@ -21,6 +21,8 @@ import Material.Textfield as Textfield
 import Material.Options as Options
 import Material.Button as Button
 import Material.Elevation as Elevation
+import Material.Table as Table
+import Material.Toggles as Toggles
 import Material.Grid exposing (grid, cell, size, offset, Device(..))
 
 import MarkdownMath exposing (toHtml)
@@ -42,7 +44,7 @@ initModel =
     { count = 0
     , mdl =
         Material.model
-    , text = ""
+    , text = "## Markdown-Math rendering\nTex maht style $$\\frac{n!}{k!(n-k)!} = \\binom{n}{k}$$"
     }
 
 
@@ -57,17 +59,22 @@ type Msg
     | Preview String
 
 type alias Message = {
-  author : String,
-  body : String,
-  title : String,
+  key : String,
+  question : String,
+  answers : List((String, Bool)),
   uid: String
 }
 
+
 sampleMessage : Message
 sampleMessage =
-  { author = "R.T."
-  , body = "ciao body, $$\\frac{n!}{k!(n-k)!} = \\binom{n}{k}$$ \n\n* sono un testo \n* molto lungo che dovrebbe risaizarsi quando rimpicciolisco lo schermo"
-  , title = "titolo"
+  { key = "h43kh2k23fsaae"
+  , question = "ciao body, $$\\frac{n!}{k!(n-k)!} = \\binom{n}{k}$$ \n\n* sono un testo \n* molto lungo che dovrebbe risaizarsi quando rimpicciolisco lo schermo\n* altro ..."
+  , answers =
+    [ ("risposta $$\\alpha$$",  True)
+    , ( "risposta $$\\beta$$",  False)
+    , ("risposta $$\\int_0^x f(x) dx $$",  False)
+    ]
   , uid = "fjk-lds34897h998sd9sadhk3hk"
   }
 
@@ -233,15 +240,40 @@ renderMessage : Model -> Message -> Html Msg
 renderMessage model msg =Card.view
   [  css "width" "100%"
   , css "max-width" "600px"
-  , Elevation.e4
+  , Elevation.e16
   -- ,Color.background (Color.color Color.Amber Color.S600)
   ]
   [ Card.title  [ ]
-                [ Card.head [ ] [ toHtml [] msg.title ]
-                , Card.subhead [ ] [ toHtml [] msg.author ]
+                [ Card.head [ ] [ toHtml [] msg.question ]
+                , Card.subhead [ ] [ toHtml [] msg.key ]
                 ]
-  , Card.text [ ] [ toHtml [] msg.body ]
+  , Card.text [ ]  [renderAnswers model msg]
   ]
+
+renderAnswers : Model -> Message -> Html Msg
+renderAnswers model msg = Table.table [css "width" "100%"]
+                      [ Table.thead []
+                        [ Table.tr []
+                          [ Table.th [css "width" "80%", css "text-align" "left"] [ text "Material" ]
+                          , Table.th [ ] [ text "Quantity" ]
+                          ]
+                        ]
+                      , Table.tbody []
+                          (msg.answers |> List.map (\(txt, correct) ->
+                             Table.tr []
+                               [ Table.td [css "text-align" "left"] [ MarkdownMath.toHtml [] txt ]
+                               , Table.td [ Table.numeric ]
+                                          [ Toggles.radio Mdl [0] model.mdl
+                                            [ Toggles.value False
+                                            , Toggles.group "MyRadioGroup"
+                                            , Toggles.ripple
+                                            ]
+                                            [ text "Emacs" ]
+                                          ]
+                               ]
+                             )
+                          )
+                      ]
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.batch
