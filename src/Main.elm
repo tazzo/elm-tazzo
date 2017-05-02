@@ -254,21 +254,21 @@ renderAnswers : Model -> Message -> Html Msg
 renderAnswers model msg = Table.table [css "width" "100%"]
                       [ Table.thead []
                         [ Table.tr []
-                          [ Table.th [css "width" "80%", css "text-align" "left"] [ text "Material" ]
+                          [ Table.th [css "width" "100%", css "text-align" "left"] [ text "Material" ]
                           , Table.th [ ] [ text "Quantity" ]
                           ]
                         ]
                       , Table.tbody []
-                          (msg.answers |> List.map (\(txt, correct) ->
+                          (msg.answers |> List.indexedMap (\n (txt, correct) ->
                              Table.tr []
                                [ Table.td [css "text-align" "left"] [ MarkdownMath.toHtml [] txt ]
                                , Table.td [ Table.numeric ]
-                                          [ Toggles.radio Mdl [0] model.mdl
+                                          [ Toggles.radio Mdl [11,n] model.mdl
                                             [ Toggles.value False
                                             , Toggles.group "MyRadioGroup"
                                             , Toggles.ripple
                                             ]
-                                            [ text "Emacs" ]
+                                            [ ]
                                           ]
                                ]
                              )
